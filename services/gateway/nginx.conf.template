@@ -1,0 +1,71 @@
+# services/gateway/nginx.conf.template
+events {
+    worker_connections  1024;
+}
+
+http {
+    upstream auth {
+        server auth:${AUTH_PORT};
+    }
+
+    # upstream notification {
+    #     server notification:${NOTIFICATION_PORT};
+    # }
+    #
+    # upstream receipt-scraper {
+    #     server receipt-scraper:${RECEIPT_SCRAPER_PORT};
+    # }
+    #
+    # upstream regex {
+    #     server regex:${REGEX_PORT};
+    # }
+    #
+    # upstream sms-parser {
+    #     server sms-parser:${SMS_PARSER_PORT};
+    # }
+    #
+    # upstream sync {
+    #     server sync:${SYNC_PORT};
+    # }
+    #
+    server {
+        listen 80;
+        server_name localhost;
+
+        location /auth/ {
+            proxy_pass http://auth;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+        }
+
+        # location /notification/ {
+        #     proxy_pass http://notification;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        # }
+        #
+        # location /receipt-scraper/ {
+        #     proxy_pass http://receipt-scraper;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        # }
+        #
+        # location /regex/ {
+        #     proxy_pass http://regex;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        # }
+        #
+        # location /sms-parser/ {
+        #     proxy_pass http://sms-parser;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        # }
+        #
+        # location /sync/ {
+        #     proxy_pass http://sync;
+        #     proxy_set_header Host $host;
+        #     proxy_set_header X-Real-IP $remote_addr;
+        # }
+    }
+}

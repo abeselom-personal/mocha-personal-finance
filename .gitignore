@@ -1,0 +1,14 @@
+# .gitignore
+**/.env
+**/main
+**/vendor/
+**/dist/
+**/node_modules/
+**/.DS_Store
+**/.vscode
+**/.idea
+**/coverage/
+**/bin/
+**/obj/
+**/*.log
+**/tmp/
