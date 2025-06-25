@@ -11,24 +11,19 @@ export $(shell sed 's/=.*//' $(ENV_FILE))
 
 build:
 	docker-compose build
-
 up:
 	docker-compose up -d
-
 down:
 	docker-compose down
-
 restart:
 	@make down
 	@make up
-
 logs:
 	docker-compose logs -f --tail=100
 
 clean:
 	docker-compose down -v --rmi all
 	docker network prune -f
-
 
 test:
 	@echo "Running all service tests with coverage inside docker containers..."
@@ -72,7 +67,6 @@ deploy: build up
 status:
 	docker-compose ps
 
-# Service-specific targets
 auth-logs:
 	docker-compose logs -f auth
 
