@@ -1,9 +1,12 @@
 // routes/auth.go
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/abeselom-personal/personal-finance/controller"
+	"github.com/gin-gonic/gin"
+)
 
-func RegisterAuthRoutes(router *gin.Engine) {
+func RegisterAuthRoutes(router *gin.Engine, authController *controller.AuthController) {
 	authGroup := router.Group("/auth")
 	authGroup.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
@@ -18,7 +21,7 @@ func RegisterAuthRoutes(router *gin.Engine) {
 	// @Success 201 {object} models.User
 	// @Failure 400 {object} gin.H
 	// @Router /auth/register [post]
-	authGroup.POST("/register", nil) // TODO
+	authGroup.POST("/register", authController.Register)
 
 	// @Summary User login
 	// @Description Authenticate user by email/phone and password
@@ -29,7 +32,7 @@ func RegisterAuthRoutes(router *gin.Engine) {
 	// @Success 200 {object} map[string]string "Tokens"
 	// @Failure 401 {object} gin.H
 	// @Router /auth/login [post]
-	authGroup.POST("/login", nil) // TODO
+	authGroup.POST("/login", authController.Login) // TODO
 
 	// @Summary Logout user
 	// @Description Revoke user token

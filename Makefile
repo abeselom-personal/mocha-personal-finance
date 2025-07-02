@@ -1,18 +1,22 @@
 # Makefile
-.PHONY: build up down restart logs clean test setup
+.PHONY: build up down restart logs clean test setup swag-init swag-copy swag-build swagger-ui
 
 ENV_FILE := .env
 GREEN=\033[0;32m
 RED=\033[0;31m
 YELLOW=\033[0;33m
 NC=\033[0m
+SWAG_BIN := swag
+SWAG_DOC_PATH := docs
+SWAG_GEN_PATH := ./docs/swagger
+SWAG_MAIN := main.go
+
 include $(ENV_FILE)
+
 export $(shell sed 's/=.*//' $(ENV_FILE))
 
 build:
 	docker-compose build
-up:
-	docker-compose up -d
 down:
 	docker-compose down
 restart:
@@ -102,3 +106,39 @@ exec:
 	 service=$$(docker-compose ps --services | sed -n "$${choice}p"); \
 	 echo "Opening shell in $$service..."; \
 	 docker-compose exec $$service sh || docker-compose exec $$service bash
+	
+
+
+swag-init:
+	@echo "$(YELLOW)Generating Swagger docs...$(NC)"
+	@for dir in $$(find services -name $(SWAG_MAIN) -exec dirname {} \;); do \
+		echo "Generating docs for $$dir..."; \
+		cd $$dir && $(SWAG_BIN) init -g $(SWAG_MAIN) -o $(SWAG_DOC_PATH) --outputTypes json && cd - > /dev/null; \
+	done
+
+swag-copy:
+	@echo "$(YELLOW)Copying Swagger JSONs to central location...$(NC)"
+	@mkdir -p $(SWAG_GEN_PATH)
+	@for dir in $$(find services -name swagger.json -exec dirname {} \;); do \
+		svc=$$(basename $$(dirname $$dir)); \
+		cp $$dir/swagger.json $(SWAG_GEN_PATH)/$$svc.json; \
+	done
+
+swag-build: swag-init swag-copy
+
+swagger-ui:
+	@echo "$(GREEN)Launching Swagger UI...$(NC)"
+	docker-compose up -d swagger-ui
+
+swagger-gen:
+	@echo "$(YELLOW)Generating and copying Swagger docs...$(NC)"
+	@mkdir -p docs/swagger
+	@for dir in $$(find services -name main.go -exec dirname {} \;); do \
+		svc=$$(basename $$dir); \
+		echo "Generating docs for $$svc..."; \
+		cd $$dir && swag init -g main.go -o docs && cd - > /dev/null; \
+		cp $$dir/docs/swagger.json docs/swagger/$$svc.json || true; \
+	done
+
+up: swagger-gen
+	docker-compose up -d

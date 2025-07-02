@@ -6,17 +6,22 @@ import (
 
 	"github.com/abeselom-personal/personal-finance/config"
 	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
-var DB *sql.DB
+var DB *gorm.DB
+var SQLDB *sql.DB
 
 func InitDB(cfg config.Config) {
 	var err error
-	DB, err = sql.Open("postgres", cfg.ConnString)
+	DB, err = gorm.Open(postgres.Open(cfg.ConnString), &gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect to database:", err)
 	}
-	if err = DB.Ping(); err != nil {
-		log.Fatal("failed to ping database:", err)
+
+	SQLDB, err = DB.DB()
+	if err != nil {
+		log.Fatal("failed to get sql.DB from gorm:", err)
 	}
 }

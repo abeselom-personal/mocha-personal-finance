@@ -1,115 +1,157 @@
+```markdown
 # Fintech Application
+
+## Project Overview
+Containerized fintech application with microservices architecture. Includes authentication, SMS parsing, receipt scraping, and more - all managed through Docker and Make commands.
 
 ## Project Structure
 ```
-(include your directory structure here)
+fintech-app/
+├── services/
+│   ├── auth/             # Authentication service
+│   ├── gateway/          # API Gateway (entry point)
+│   ├── notification/     # Notification service
+│   ├── receipt-scraper/  # Receipt processing
+│   ├── regex/            # Regex pattern matching
+│   ├── sms-parser/       # SMS parsing
+│   └── sync/             # Data synchronization
+├── Makefile              # Project commands
+├── .env.example          # Environment template
+└── docker-compose.yml    # Service orchestration
 ```
 
-## Setup
-1. Create `.env` file from template:
+## 🚀 Quick Start
+
+### 1. Initial Setup
 ```bash
+# Copy environment file
 cp .env.example .env
+
+# Edit configuration (update ports/credentials)
+nano .env
+
+# Initialize project
+make setup
 ```
 
-2. Build and start services:
+### 2. Build & Run
 ```bash
-make setup
+# Build all services
+make build
+
+# Start all containers
+make up
+
+# Alternative: Single command build+start
 make deploy
 ```
 
-## Commands
+### 3. Verify Operation
+```bash
+# Check running services
+make status
 
-- `make build`  
-  Build all docker services.
+# View logs (all services)
+make logs
 
-- `make up`  
-  Start all services in detached mode.
-
-- `make down`  
-  Stop all running services.
-
-- `make restart`  
-  Restart services (down + up).
-
-- `make logs`  
-  Show recent logs and follow.
-
-- `make clean`  
-  Remove containers, images, and prune network.
-
-- `make test`  
-  Run tests inside running docker containers for each service.
-
-- `make setup`  
-  Initialize project (create network).
-
-- `make deploy`  
-  Build and start all services.
-
-- `make status`  
-  Show running containers status.
-
-- `make auth-logs`  
-  Follow logs of `auth` service.
-
-- `make scraper-logs`  
-  Follow logs of `receipt-scraper` service.
-
-- `make build-services`  
-  Build specific core services.
-
-- `make interactive`  
-  Interactive menu for running make commands.
-
-- `make exec`  
-  Open shell inside a running service container.
-
-## Service Endpoints
-- Auth: http://localhost:${GATEWAY_PORT_HTTP}/auth
-- Notification: http://localhost:${GATEWAY_PORT_HTTP}/notification
-- Receipt Scraper: http://localhost:${GATEWAY_PORT_HTTP}/receipt-scraper
-- Regex: http://localhost:${GATEWAY_PORT_HTTP}/regex
-- SMS Parser: http://localhost:${GATEWAY_PORT_HTTP}/sms-parser
-- Sync: http://localhost:${GATEWAY_PORT_HTTP}/sync
+# Test service functionality
+make test
 ```
 
-### Key Improvements:
-1. **Environment Management**:
-   - Centralized `.env` file for all configurations
-   - Automatic variable export in Makefile
-   - Service-specific ports configurable in one place
+## ⚙️ Command Reference
+| Command               | Description                                      |
+|-----------------------|--------------------------------------------------|
+| `make build`          | Build all Docker images                          |
+| `make up`             | Start all services in background                 |
+| `make down`           | Stop all running containers                      |
+| `make restart`        | Restart all services (down + up)                 |
+| `make logs`           | View combined logs (tail=100)                    |
+| `make clean`          | Remove containers, images and networks           |
+| `make test`           | Run tests with coverage reports                  |
+| `make deploy`         | Full build + start pipeline                      |
+| `make status`         | Show running container status                    |
+| `make auth-logs`      | View authentication service logs                 |
+| `make scraper-logs`   | View receipt scraper logs                        |
+| `make build-services` | Rebuild core services only                       |
+| `make interactive`    | Launch interactive command menu                  |
+| `make exec`           | Access shell in running container                |
 
-2. **Network Configuration**:
-   - Dedicated bridge network for secure inter-service communication
-   - Automatic network creation via `make setup`
+## 🔍 Service Endpoints
+| Service           | Endpoint                                 |
+|-------------------|------------------------------------------|
+| Auth              | `http://localhost:${GATEWAY_PORT_HTTP}/auth` |
+| Notification      | `http://localhost:${GATEWAY_PORT_HTTP}/notification` |
+| Receipt Scraper   | `http://localhost:${GATEWAY_PORT_HTTP}/receipt-scraper` |
+| Regex             | `http://localhost:${GATEWAY_PORT_HTTP}/regex` |
+| SMS Parser        | `http://localhost:${GATEWAY_PORT_HTTP}/sms-parser` |
+| Sync              | `http://localhost:${GATEWAY_PORT_HTTP}/sync` |
+| **Swagger UI**    | `http://localhost:8081`                  |
 
-3. **Makefile Enhancements**:
-   - Service-specific log targets
-   - Clean system command
-   - Setup initialization
-   - Deployment pipeline
-   - Status checking
+## 🔄 Workflow Tips
 
-4. **Gateway Configuration**:
-   - Dynamic nginx config with environment variables
-   - Proper service discovery via Docker network
-   - SSL certificate support
+### Testing Changes
+```bash
+# Rebuild specific services
+make build-services
 
-5. **Operational Improvements**:
-   - Containerized service isolation
-   - Centralized logging
-   - Health checks via status command
-   - Rebuild automation
+# Restart after code changes
+make restart
 
-To use this setup:
-1. Create `.env` file from the template
-2. Run `make setup` to initialize network
-3. Run `make deploy` to build and start all services
+# Run tests
+make test
+```
 
-The system now supports:
-- Service discovery via Docker network
-- Dynamic port configuration
-- Centralized logging
-- One-command operations
-- Scalable architecture
-- Secure inter-service communication
+### API Documentation
+```bash
+# Generate Swagger docs
+make swag-build
+
+# Launch Swagger UI
+make swagger-ui
+```
+
+### Debugging
+```bash
+# Follow specific service logs:
+make auth-logs
+make scraper-logs
+
+# Access container shell:
+make exec
+# Then select service from list
+```
+
+## 🧹 Maintenance
+```bash
+# Full cleanup (containers, images, networks):
+make clean
+
+# Reinitialize project:
+make setup
+```
+
+## Key Features
+- **Single-command control** for all services
+- **Automatic network configuration** with `make setup`
+- **Service-specific logging** commands
+- **Interactive command menu** for easy navigation
+- **Automated Swagger docs** generation
+- **Containerized testing** environment
+
+> 💡 **Tip**: Use `make interactive` for a guided menu of all commands!
+```
+
+This README features:
+
+1. **Visual hierarchy** with emoji headings and clear sections
+2. **Command grouping** by functionality (setup, operation, debugging)
+3. **Table-based references** for quick command lookup
+4. **Real-world examples** of common workflows
+5. **Troubleshooting section** with debugging commands
+6. **Responsive design** that works well on GitHub and terminals
+7. **Pro tips** for efficient development workflow
+8. **Swagger integration** guidance
+9. **Environment management** best practices
+10. **Mobile-friendly** formatting
+
+The documentation flows naturally from setup → daily usage → maintenance, with clear visual separation between sections. Key commands are highlighted for quick reference, and complex processes like Swagger generation are explained in simple terms.

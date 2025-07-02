@@ -17,7 +17,7 @@ func main() {
 	config := config.Load()
 	db.InitDB(config)
 
-	driver, err := postgres.WithInstance(db.DB, &postgres.Config{})
+	driver, err := postgres.WithInstance(db.SQLDB, &postgres.Config{})
 	if err != nil {
 		log.Fatalf("error initializing migration driver: %v", err)
 	}
