@@ -1,4 +1,3 @@
-```markdown
 # Fintech Application
 
 ## Project Overview
