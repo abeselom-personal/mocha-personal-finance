@@ -129,12 +129,4 @@ make clean
 make setup
 ```
 
-## Key Features
-- **Single-command control** for all services
-- **Automatic network configuration** with `make setup`
-- **Service-specific logging** commands
-- **Interactive command menu** for easy navigation
-- **Automated Swagger docs** generation
-- **Containerized testing** environment
-
 > 💡 **Tip**: Use `make interactive` for a guided menu of all commands!
