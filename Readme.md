@@ -138,19 +138,3 @@ make setup
 - **Containerized testing** environment
 
 > 💡 **Tip**: Use `make interactive` for a guided menu of all commands!
-```
-
-This README features:
-
-1. **Visual hierarchy** with emoji headings and clear sections
-2. **Command grouping** by functionality (setup, operation, debugging)
-3. **Table-based references** for quick command lookup
-4. **Real-world examples** of common workflows
-5. **Troubleshooting section** with debugging commands
-6. **Responsive design** that works well on GitHub and terminals
-7. **Pro tips** for efficient development workflow
-8. **Swagger integration** guidance
-9. **Environment management** best practices
-10. **Mobile-friendly** formatting
-
-The documentation flows naturally from setup → daily usage → maintenance, with clear visual separation between sections. Key commands are highlighted for quick reference, and complex processes like Swagger generation are explained in simple terms.

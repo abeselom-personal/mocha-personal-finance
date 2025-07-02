@@ -12,10 +12,24 @@ type AuthController struct {
 	AuthService *service.AuthService
 }
 
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
 func NewAuthController(authService *service.AuthService) *AuthController {
 	return &AuthController{AuthService: authService}
 }
 
+// Register godoc
+// @Summary Register a new user
+// @Description Create a new user
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Param user body models.User true "User registration info"
+// @Success 201 {object} models.User
+// @Failure 400 {object} ErrorResponse
+// @Router /auth/register [post]
 func (ac *AuthController) Register(c *gin.Context) {
 	var req dto.RegisterDTO
 	if err := c.ShouldBindJSON(&req); err != nil {

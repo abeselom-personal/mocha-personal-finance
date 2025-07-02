@@ -1,4 +1,5 @@
 MIGRATE ?= migrate
+SWAGGER_OUT := ./docs/swagger
 
 create:
 	@timestamp=$$(date +%s); \
@@ -14,4 +15,7 @@ up:
 down:
 	$(MIGRATE) -database $$DATABASE_URL -path ./migrations down
 
-.PHONY: create up down
+swagger-gen:
+	swag init -g routes/routes.go -o $(SWAGGER_OUT)
+
+.PHONY: create up down swagger-gen

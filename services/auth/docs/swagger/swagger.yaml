@@ -1,0 +1,126 @@
+definitions:
+  controller.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Permission:
+    properties:
+      description:
+        type: string
+      group:
+        description: e.g. "user", "auth"
+        type: string
+      id:
+        type: integer
+      name:
+        description: e.g. "user:create"
+        type: string
+      roles:
+        items:
+          $ref: '#/definitions/models.Role'
+        type: array
+      users:
+        items:
+          $ref: '#/definitions/models.User'
+        type: array
+    type: object
+  models.Role:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/models.Permission'
+        type: array
+    type: object
+  models.Token:
+    properties:
+      createdAt:
+        type: string
+      expiresAt:
+        type: string
+      id:
+        type: integer
+      ip:
+        type: string
+      revoked:
+        type: boolean
+      scope:
+        description: optional scope/claim
+        type: string
+      token:
+        type: string
+      type:
+        description: access, refresh
+        type: string
+      userAgent:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.User:
+    properties:
+      createdAt:
+        type: string
+      email:
+        type: string
+      fullName:
+        type: string
+      id:
+        type: integer
+      isActive:
+        type: boolean
+      lastLogin:
+        type: string
+      passwordHash:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/models.Permission'
+        type: array
+      role:
+        $ref: '#/definitions/models.Role'
+      roleID:
+        type: integer
+      tokens:
+        items:
+          $ref: '#/definitions/models.Token'
+        type: array
+      updatedAt:
+        type: string
+      username:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Create a new user
+      parameters:
+      - description: User registration info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controller.ErrorResponse'
+      summary: Register a new user
+      tags:
+      - Auth
+swagger: "2.0"

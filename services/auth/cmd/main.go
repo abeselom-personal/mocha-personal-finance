@@ -13,6 +13,11 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// @title Personal Finance API
+// @version 1.0
+// @description This is the Personal Finance microservice API.
+// @host localhost:8080
+// @BasePath /
 func main() {
 	config := config.Load()
 	db.InitDB(config)

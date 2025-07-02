@@ -1,5 +1,5 @@
 # Makefile
-.PHONY: build up down restart logs clean test setup swag-init swag-copy swag-build swagger-ui
+.PHONY: build up down restart logs clean test setup swag-init swag-copy swag-build swagger-ui generate-swagger-initializer
 
 ENV_FILE := .env
 GREEN=\033[0;32m
@@ -109,36 +109,50 @@ exec:
 	
 
 
+
 swag-init:
-	@echo "$(YELLOW)Generating Swagger docs...$(NC)"
+	@echo "Generating Swagger docs..."
 	@for dir in $$(find services -name $(SWAG_MAIN) -exec dirname {} \;); do \
-		echo "Generating docs for $$dir..."; \
+		svc=$$(basename $$dir); \
+		echo "Generating docs for $$svc..."; \
 		cd $$dir && $(SWAG_BIN) init -g $(SWAG_MAIN) -o $(SWAG_DOC_PATH) --outputTypes json && cd - > /dev/null; \
 	done
 
 swag-copy:
-	@echo "$(YELLOW)Copying Swagger JSONs to central location...$(NC)"
+	@echo "Copying Swagger JSONs to central location..."
 	@mkdir -p $(SWAG_GEN_PATH)
 	@for dir in $$(find services -name swagger.json -exec dirname {} \;); do \
-		svc=$$(basename $$(dirname $$dir)); \
+		svc=$$(basename $$(dirname $$(dirname $$dir))); \
 		cp $$dir/swagger.json $(SWAG_GEN_PATH)/$$svc.json; \
 	done
 
 swag-build: swag-init swag-copy
+	@echo "Swagger docs generated and copied."
+
+swagger-gen: swag-build
 
 swagger-ui:
-	@echo "$(GREEN)Launching Swagger UI...$(NC)"
+	@echo "Starting Swagger UI..."
 	docker-compose up -d swagger-ui
 
-swagger-gen:
-	@echo "$(YELLOW)Generating and copying Swagger docs...$(NC)"
-	@mkdir -p docs/swagger
-	@for dir in $$(find services -name main.go -exec dirname {} \;); do \
-		svc=$$(basename $$dir); \
-		echo "Generating docs for $$svc..."; \
-		cd $$dir && swag init -g main.go -o docs && cd - > /dev/null; \
-		cp $$dir/docs/swagger.json docs/swagger/$$svc.json || true; \
+generate-swagger-initializer:
+	@echo "Generating swagger-initializer.js..."
+	@echo "window.onload = () => {" > docs/swagger/swagger-initializer.js
+	@echo "  window.ui = SwaggerUIBundle({" >> docs/swagger/swagger-initializer.js
+	@echo "    urls: [" >> docs/swagger/swagger-initializer.js
+	@for file in $$(ls docs/swagger/*.json); do \
+		name=$$(basename $$file .json); \
+		echo "      { url: \"$$name.json\", name: \"$$name Service\" }," >> docs/swagger/swagger-initializer.js; \
 	done
+	@echo "    ]," >> docs/swagger/swagger-initializer.js
+	@echo "    dom_id: \"#swagger-ui\"," >> docs/swagger/swagger-initializer.js
+	@echo "    deepLinking: true," >> docs/swagger/swagger-initializer.js
+	@echo "    presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset]," >> docs/swagger/swagger-initializer.js
+	@echo "    layout: \"StandaloneLayout\"" >> docs/swagger/swagger-initializer.js
+	@echo "  });" >> docs/swagger/swagger-initializer.js
+	@echo "};" >> docs/swagger/swagger-initializer.js
+
+swagger-gen: swag-init swag-copy generate-swagger-initializer
 
 up: swagger-gen
 	docker-compose up -d
