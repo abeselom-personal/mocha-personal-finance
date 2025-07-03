@@ -106,16 +106,15 @@ exec:
 	 service=$$(docker-compose ps --services | sed -n "$${choice}p"); \
 	 echo "Opening shell in $$service..."; \
 	 docker-compose exec $$service sh || docker-compose exec $$service bash
-	
-
-
 
 swag-init:
 	@echo "Generating Swagger docs..."
 	@for dir in $$(find services -name $(SWAG_MAIN) -exec dirname {} \;); do \
-		svc=$$(basename $$dir); \
-		echo "Generating docs for $$svc..."; \
-		cd $$dir && $(SWAG_BIN) init -g $(SWAG_MAIN) -o $(SWAG_DOC_PATH) --outputTypes json && cd - > /dev/null; \
+		svc_dir=$$(dirname $$dir); \
+		echo "Found service dir: $$svc_dir"; \
+		echo "Running make swagger-gen in $$svc_dir"; \
+		$(MAKE) -C $$svc_dir swagger-gen; \
+		echo "Done with $$(basename $$svc_dir)"; \
 	done
 
 swag-copy:
@@ -128,8 +127,6 @@ swag-copy:
 
 swag-build: swag-init swag-copy
 	@echo "Swagger docs generated and copied."
-
-swagger-gen: swag-build
 
 swagger-ui:
 	@echo "Starting Swagger UI..."

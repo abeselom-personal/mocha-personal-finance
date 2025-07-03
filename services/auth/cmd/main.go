@@ -5,6 +5,7 @@ import (
 
 	"github.com/abeselom-personal/personal-finance/config"
 	"github.com/abeselom-personal/personal-finance/db"
+	"github.com/abeselom-personal/personal-finance/models"
 	"github.com/abeselom-personal/personal-finance/routes"
 	"github.com/gin-gonic/gin"
 	migrate "github.com/golang-migrate/migrate/v4"
@@ -13,13 +14,13 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// @title Personal Finance API
+// @title Personal Finance Auth API
 // @version 1.0
-// @description This is the Personal Finance microservice API.
-// @host localhost:8080
-// @BasePath /
+// @description This is the Personal Finance Auth Microservice API.
+// @host localhost
+// @BasePath /auth
 func main() {
-	config := config.Load()
+	config := config.LoadConfig()
 	db.InitDB(config)
 
 	driver, err := postgres.WithInstance(db.SQLDB, &postgres.Config{})
@@ -37,6 +38,17 @@ func main() {
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		log.Fatalf("error running migrations: %v", err)
+	}
+	if err == nil {
+		log.Println("migrations ran successfully")
+	}
+	if err := db.DB.AutoMigrate(
+		&models.User{},
+		&models.Role{},
+		&models.Permission{},
+		&models.Token{},
+	); err != nil {
+		log.Fatal("Failed to migrate database:", err)
 	}
 
 	router := gin.Default()

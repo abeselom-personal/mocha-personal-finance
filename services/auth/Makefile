@@ -16,6 +16,6 @@ down:
 	$(MIGRATE) -database $$DATABASE_URL -path ./migrations down
 
 swagger-gen:
-	swag init -g routes/routes.go -o $(SWAGGER_OUT)
+	swag init -g cmd/main.go -o docs/swagger -d .
 
 .PHONY: create up down swagger-gen

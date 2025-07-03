@@ -1,7 +1,8 @@
+// repositories/token_repository.go
 package repositories
 
 import (
-	"errors"
+	"context"
 
 	"github.com/abeselom-personal/personal-finance/models"
 	"gorm.io/gorm"
@@ -15,18 +16,21 @@ func NewTokenRepository(db *gorm.DB) *TokenRepository {
 	return &TokenRepository{db: db}
 }
 
-func (r *TokenRepository) Create(token *models.Token) error {
-	return r.db.Create(token).Error
+func (r *TokenRepository) Create(ctx context.Context, token *models.Token) error {
+	return r.db.WithContext(ctx).Create(token).Error
 }
 
-func (r *TokenRepository) GetByToken(token string) (*models.Token, error) {
+func (r *TokenRepository) GetByToken(ctx context.Context, token string) (*models.Token, error) {
 	var t models.Token
-	err := r.db.Where("token = ?", token).First(&t).Error
+	err := r.db.WithContext(ctx).
+		Where("token = ?", token).
+		First(&t).Error
 	return &t, err
 }
 
-func (r *TokenRepository) Revoke(token string) error {
-	result := r.db.Model(&models.Token{}).
+func (r *TokenRepository) Revoke(ctx context.Context, token string) error {
+	result := r.db.WithContext(ctx).
+		Model(&models.Token{}).
 		Where("token = ?", token).
 		Update("revoked", true)
 
@@ -34,13 +38,14 @@ func (r *TokenRepository) Revoke(token string) error {
 		return result.Error
 	}
 	if result.RowsAffected == 0 {
-		return errors.New("token not found")
+		return gorm.ErrRecordNotFound
 	}
 	return nil
 }
 
-func (r *TokenRepository) RevokeAllForUser(userID uint) error {
-	return r.db.Model(&models.Token{}).
+func (r *TokenRepository) RevokeAllForUser(ctx context.Context, userID uint) error {
+	return r.db.WithContext(ctx).
+		Model(&models.Token{}).
 		Where("user_id = ?", userID).
 		Update("revoked", true).Error
 }

@@ -1,45 +1,39 @@
-// routes/auth.go
 package routes
 
 import (
+	"net/http"
+
+	"github.com/abeselom-personal/personal-finance/config"
 	"github.com/abeselom-personal/personal-finance/controller"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/time/rate"
 )
 
-func RegisterAuthRoutes(router *gin.Engine, authController *controller.AuthController) {
+func RegisterAuthRoutes(
+	router *gin.Engine,
+	authController *controller.AuthController,
+	authMiddleware gin.HandlerFunc,
+	cfg *config.Config,
+) {
 	authGroup := router.Group("/auth")
-	authGroup.GET("/ping", func(c *gin.Context) {
-		c.JSON(200, gin.H{"message": "pong"})
-	})
 
-	// @Summary Register a new user
-	// @Description Create a new user with email or phone and password
-	// @Tags Auth
-	// @Accept json
-	// @Produce json
-	// @Param user body models.User true "User registration info"
-	// @Success 201 {object} models.User
-	// @Failure 400 {object} gin.H
-	// @Router /auth/register [post]
-	authGroup.POST("/register", authController.Register)
+	// Rate limiting
+	registerLimiter := rate.NewLimiter(rate.Every(cfg.RateLimitWindow), cfg.RateLimitRegister)
+	loginLimiter := rate.NewLimiter(rate.Every(cfg.RateLimitWindow), cfg.RateLimitLogin)
 
-	// @Summary User login
-	// @Description Authenticate user by email/phone and password
-	// @Tags Auth
-	// @Accept json
-	// @Produce json
-	// @Param credentials body map[string]string true "Login credentials"
-	// @Success 200 {object} map[string]string "Tokens"
-	// @Failure 401 {object} gin.H
-	// @Router /auth/login [post]
-	authGroup.POST("/login", authController.Login) // TODO
+	authGroup.POST("/register", rateLimitMiddleware(registerLimiter), authController.Register)
+	authGroup.POST("/login", rateLimitMiddleware(loginLimiter), authController.Login)
+	authGroup.POST("/refresh", authController.Refresh)
+	authGroup.POST("/logout", authMiddleware, authController.Logout)
+}
 
-	// @Summary Logout user
-	// @Description Revoke user token
-	// @Tags Auth
-	// @Produce json
-	// @Success 200 {object} gin.H
-	// @Failure 401 {object} gin.H
-	// @Router /auth/logout [post]
-	authGroup.POST("/logout", nil) // TODO
+func rateLimitMiddleware(limiter *rate.Limiter) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		if !limiter.Allow() {
+			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests"})
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 }
