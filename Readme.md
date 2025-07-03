@@ -78,6 +78,7 @@ make test
 ## 🔍 Service Endpoints
 | Service           | Endpoint                                 |
 |-------------------|------------------------------------------|
+| Swagger           | `http://localhost:${GATEWAY_PORT_HTTP}/swagger` |
 | Auth              | `http://localhost:${GATEWAY_PORT_HTTP}/auth` |
 | Notification      | `http://localhost:${GATEWAY_PORT_HTTP}/notification` |
 | Receipt Scraper   | `http://localhost:${GATEWAY_PORT_HTTP}/receipt-scraper` |
