@@ -104,17 +104,17 @@ make test
 ### API Documentation
 ```bash
 # Generate Swagger docs
-make swag-build
+make swagger-gen
 
-# Launch Swagger UI
-make swagger-ui
 ```
-
 ### Debugging
 ```bash
 # Follow specific service logs:
 make auth-logs
 make scraper-logs
+
+# Follow Logs For All Services
+make logs
 
 # Access container shell:
 make exec
