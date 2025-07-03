@@ -85,7 +85,6 @@ make test
 | Regex             | `http://localhost:${GATEWAY_PORT_HTTP}/regex` |
 | SMS Parser        | `http://localhost:${GATEWAY_PORT_HTTP}/sms-parser` |
 | Sync              | `http://localhost:${GATEWAY_PORT_HTTP}/sync` |
-| **Swagger UI**    | `http://localhost:8081`                  |
 
 ## 🔄 Workflow Tips
 
